@@ -2148,6 +2148,8 @@ static const CRPCCommand commands[] =
     { "omni layer (transaction creation)", "omni_senddisablefreezing",     &omni_senddisablefreezing,     {"fromaddress", "propertyid"} },
     { "omni layer (transaction creation)", "omni_sendfreeze",              &omni_sendfreeze,              {"fromaddress", "toaddress", "propertyid", "amount"} },
     { "omni layer (transaction creation)", "omni_sendunfreeze",            &omni_sendunfreeze,            {"fromaddress", "toaddress", "propertyid", "amount"} },
+    { "omni layer (transaction creation)", "omni_sendadddelegate",         &omni_sendadddelegate,         {"fromaddress", "propertyid", "delegateaddress"} },
+    { "omni layer (transaction creation)", "omni_sendremovedelegate",      &omni_sendremovedelegate,      {"fromaddress", "propertyid", "delegateaddress"} },
     { "omni layer (transaction creation)", "omni_sendanydata",             &omni_sendanydata,             {"fromaddress", "data", "toaddress"} },
     { "hidden",                            "omni_senddeactivation",        &omni_senddeactivation,        {"fromaddress", "featureid"} },
     { "hidden",                            "omni_sendactivation",          &omni_sendactivation,          {"fromaddress", "featureid", "block", "minclientversion"} },

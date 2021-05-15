@@ -2668,6 +2668,11 @@ int CMPTransaction::logicMath_RemoveDelegate(CBlockIndex* pindex)
         return (PKT_ERROR_TOKENS -45);
     }
 
+    if (receiver.compare(sp.getDelegate(block)) != 0) {
+        PrintToLog("%s(): rejected: delegate to remove %s does not match current delegate %s\n", __func__, receiver, sp.getDelegate(block));
+        return (PKT_ERROR_TOKENS -46);
+    }
+
     // ------------------------------------------
 
     sp.removeDelegate(block, tx_idx);
@@ -2676,47 +2681,6 @@ int CMPTransaction::logicMath_RemoveDelegate(CBlockIndex* pindex)
     sp.update_block = blockHash;
 
     assert(pDbSpInfo->updateSP(property, sp));
-
-    return 0;
-}
-
-/** Tx 74 */
-int CMPTransaction::logicMath_RemoveDelegate(CBlockIndex* pindex)
-{
-    if (pindex == nullptr) {
-        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
-        return (PKT_ERROR_TOKENS -20);
-    }
-
-    if (!IsTransactionTypeAllowed(block, property, type, version)) {
-        PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
-                __func__,
-                type,
-                version,
-                property,
-                block);
-        return (PKT_ERROR_TOKENS -22);
-    }
-
-    if (!IsPropertyIdValid(property)) {
-        PrintToLog("%s(): rejected: property %d does not exist\n", __func__, property);
-        return (PKT_ERROR_TOKENS -24);
-    }
-
-    CMPSPInfo::Entry sp;
-    assert(pDbSpInfo->getSP(property, sp));
-
-    if (!sp.manual) {
-        PrintToLog("%s(): rejected: property %d is not managed\n", __func__, property);
-        return (PKT_ERROR_TOKENS -42);
-    }
-
-    if (sender != sp.getIssuer(block)) {
-        PrintToLog("%s(): rejected: sender %s is not issuer of property %d [issuer=%s]\n", __func__, sender, property, sp.issuer);
-        return (PKT_ERROR_TOKENS -43);
-    }
-
-    // TODO!!!!
 
     return 0;
 }
