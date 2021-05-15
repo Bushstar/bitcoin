@@ -182,6 +182,12 @@ bool CMPTransaction::interpret_Transaction()
         case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS:
             return interpret_UnfreezeTokens();
 
+        case MSC_TYPE_ADD_DELEGATE:
+            return interpret_AddDelegate();
+
+        case MSC_TYPE_REMOVE_DELEGATE:
+            return interpret_RemoveDelegate();
+
         case OMNICORE_MESSAGE_TYPE_DEACTIVATION:
             return interpret_Deactivation();
             
@@ -818,6 +824,38 @@ bool CMPTransaction::interpret_UnfreezeTokens()
         PrintToLog("\t        property: %d (%s)\n", property, strMPProperty(property));
         PrintToLog("\t  value (unused): %s\n", FormatMP(property, nValue));
         PrintToLog("\t         address: %s\n", receiver);
+    }
+
+    return true;
+}
+
+/** Tx 73 */
+bool CMPTransaction::interpret_AddDelegate()
+{
+    if (pkt_size < 8) {
+        return false;
+    }
+    memcpy(&property, &pkt[4], 4);
+    SwapByteOrder32(property);
+
+    if ((!rpcOnly && msc_debug_packets) || msc_debug_packets_readonly) {
+        PrintToLog("\t        property: %d (%s)\n", property, strMPProperty(property));
+    }
+
+    return true;
+}
+
+/** Tx 74 */
+bool CMPTransaction::interpret_RemoveDelegate()
+{
+    if (pkt_size < 8) {
+        return false;
+    }
+    memcpy(&property, &pkt[4], 4);
+    SwapByteOrder32(property);
+
+    if ((!rpcOnly && msc_debug_packets) || msc_debug_packets_readonly) {
+        PrintToLog("\t        property: %d (%s)\n", property, strMPProperty(property));
     }
 
     return true;
@@ -2530,6 +2568,88 @@ int CMPTransaction::logicMath_UnfreezeTokens(CBlockIndex* pindex)
     }
 
     unfreezeAddress(receiver, property);
+
+    return 0;
+}
+
+/** Tx 73 */
+int CMPTransaction::logicMath_AddDelegate(CBlockIndex* pindex)
+{
+    if (pindex == nullptr) {
+        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+        return (PKT_ERROR_TOKENS -20);
+    }
+
+    if (!IsTransactionTypeAllowed(block, property, type, version)) {
+        PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
+                __func__,
+                type,
+                version,
+                property,
+                block);
+        return (PKT_ERROR_TOKENS -22);
+    }
+
+    if (!IsPropertyIdValid(property)) {
+        PrintToLog("%s(): rejected: property %d does not exist\n", __func__, property);
+        return (PKT_ERROR_TOKENS -24);
+    }
+
+    CMPSPInfo::Entry sp;
+    assert(pDbSpInfo->getSP(property, sp));
+
+    if (!sp.manual) {
+        PrintToLog("%s(): rejected: property %d is not managed\n", __func__, property);
+        return (PKT_ERROR_TOKENS -42);
+    }
+
+    if (sender != sp.getIssuer(block)) {
+        PrintToLog("%s(): rejected: sender %s is not issuer of property %d [issuer=%s]\n", __func__, sender, property, sp.issuer);
+        return (PKT_ERROR_TOKENS -43);
+    }
+
+    // TODO!!!!
+
+    return 0;
+}
+
+/** Tx 74 */
+int CMPTransaction::logicMath_RemoveDelegate(CBlockIndex* pindex)
+{
+    if (pindex == nullptr) {
+        PrintToLog("%s(): ERROR: block %d not in the active chain\n", __func__, block);
+        return (PKT_ERROR_TOKENS -20);
+    }
+
+    if (!IsTransactionTypeAllowed(block, property, type, version)) {
+        PrintToLog("%s(): rejected: type %d or version %d not permitted for property %d at block %d\n",
+                __func__,
+                type,
+                version,
+                property,
+                block);
+        return (PKT_ERROR_TOKENS -22);
+    }
+
+    if (!IsPropertyIdValid(property)) {
+        PrintToLog("%s(): rejected: property %d does not exist\n", __func__, property);
+        return (PKT_ERROR_TOKENS -24);
+    }
+
+    CMPSPInfo::Entry sp;
+    assert(pDbSpInfo->getSP(property, sp));
+
+    if (!sp.manual) {
+        PrintToLog("%s(): rejected: property %d is not managed\n", __func__, property);
+        return (PKT_ERROR_TOKENS -42);
+    }
+
+    if (sender != sp.getIssuer(block)) {
+        PrintToLog("%s(): rejected: sender %s is not issuer of property %d [issuer=%s]\n", __func__, sender, property, sp.issuer);
+        return (PKT_ERROR_TOKENS -43);
+    }
+
+    // TODO!!!!
 
     return 0;
 }
