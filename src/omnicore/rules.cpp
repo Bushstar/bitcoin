@@ -523,6 +523,7 @@ bool ActivateFeature(uint16_t featureId, int activationBlock, uint32_t minClient
         break;
         case FEATURE_NONFUNGIBLE:
             MutableConsensusParams().MSC_NONFUNGIBLE_BLOCK = activationBlock;
+        break;
         case FEATURE_DELEGATEDISSUANCE:
             MutableConsensusParams().MSC_DELEGATED_ISSUANCE_BLOCK = activationBlock;
         break;

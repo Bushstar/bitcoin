@@ -2185,7 +2185,7 @@ int CMPTransaction::logicMath_GrantTokens(CBlockIndex* pindex, uint256& blockHas
         return (PKT_ERROR_TOKENS -42);
     }
 
-    if (sender != sp.getIssuer(block) || sender != sp.getDelegate(block)) {
+    if (sender != sp.getIssuer(block) && sender != sp.getDelegate(block)) {
         PrintToLog("%s(): rejected: sender %s is not issuer or delegate of property %d [issuer=%s, delegate=%s]\n", __func__, sender, property, sp.issuer, sp.delegate);
         return (PKT_ERROR_TOKENS -43);
     }
@@ -2658,8 +2658,8 @@ int CMPTransaction::logicMath_RemoveDelegate(CBlockIndex* pindex)
         return (PKT_ERROR_TOKENS -42);
     }
 
-    if (sender != sp.getIssuer(block)) {
-        PrintToLog("%s(): rejected: sender %s is not issuer of property %d [issuer=%s]\n", __func__, sender, property, sp.issuer);
+    if (sender != sp.getIssuer(block) && sender != sp.getDelegate(block)) {
+        PrintToLog("%s(): rejected: sender %s is not issuer or delegate of property %d [issuer=%s, delegate=%s]\n", __func__, sender, property, sp.getIssuer(block), sp.getDelegate(block));
         return (PKT_ERROR_TOKENS -43);
     }
 
