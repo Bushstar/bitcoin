@@ -1136,7 +1136,7 @@ static UniValue omni_sendgrant(const JSONRPCRequest& request)
     // perform checks
     RequireExistingProperty(propertyId);
     RequireManagedProperty(propertyId);
-    RequireTokenIssuer(fromAddress, propertyId);
+    // RequireTokenIssuer(fromAddress, propertyId); TODO!!!!
 
     // create a payload for the transaction
     std::vector<unsigned char> payload = CreatePayload_Grant(propertyId, amount, info);
@@ -1769,6 +1769,7 @@ static UniValue omni_sendadddelegate(const JSONRPCRequest& request)
     RequireExistingProperty(propertyId);
     RequireManagedProperty(propertyId);
     RequireTokenIssuer(fromAddress, propertyId);
+    
     RequireEmptyDelegate(propertyId);
 
     // create a payload for the transaction

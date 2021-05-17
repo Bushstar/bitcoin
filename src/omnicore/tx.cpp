@@ -1070,6 +1070,12 @@ int CMPTransaction::interpretPacket()
 
         case MSC_TYPE_UNFREEZE_PROPERTY_TOKENS:
             return logicMath_UnfreezeTokens(pindex);
+            
+        case MSC_TYPE_ADD_DELEGATE:
+            return logicMath_AddDelegate(pindex);
+
+        case MSC_TYPE_REMOVE_DELEGATE:
+            return logicMath_RemoveDelegate(pindex);
 
         case MSC_TYPE_ANYDATA:
             return logicMath_AnyData();

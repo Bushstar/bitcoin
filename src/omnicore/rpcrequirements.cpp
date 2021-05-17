@@ -62,8 +62,9 @@ void RequireExistingDelegate(uint32_t propertyId)
 void RequireEmptyDelegate(uint32_t propertyId)
 {
     LOCK(cs_tally);
-    if (!mastercore::HasDelegate(propertyId)) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Property already has a delegate");
+    PrintToConsole("has delegate: %d\n", mastercore::HasDelegate(propertyId));
+    if (mastercore::HasDelegate(propertyId)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Property already has a delegate " + mastercore::GetDelegate(propertyId));
     }
 }
 
