@@ -31,7 +31,7 @@ class OmniDelegation(BitcoinTestFramework):
         self.extra_args = [['-omniactivationallowsender=any']]
 
     def run_test(self):
-        self.log.info("test delegation of token issuance")
+        self.log.info("Test delegation of token issuance")
 
         node = self.nodes[0]
 
@@ -68,6 +68,9 @@ class OmniDelegation(BitcoinTestFramework):
         txid = node.omni_sendadddelegate(issuer_address, 3, delegate_address)
         node.generatetoaddress(1, coinbase_address)
         tx = node.omni_gettransaction(txid)
+        info = node.omni_getproperty(3)
+        assert_equal(tx['valid'], True)
+        assert_equal(info['delegate'], delegate_address)
 
         # Try again to issue new tokens from the delegate address
         txid = node.omni_sendgrant(delegate_address, sink_address, 3, "77")
@@ -75,6 +78,21 @@ class OmniDelegation(BitcoinTestFramework):
         tx = node.omni_gettransaction(txid)
         assert_equal(tx['valid'], True)
 
+        # Remove delegate status
+        txid = node.omni_sendremovedelegate(issuer_address, 3, delegate_address)
+        node.generatetoaddress(1, coinbase_address)
+        tx = node.omni_gettransaction(txid)
+        info = node.omni_getproperty(3)
+        assert_equal(tx['valid'], True)
+        assert_equal(info['delegate'], "")
+
+        # Try again to issue new tokens from the delegate address
+        txid = node.omni_sendgrant(delegate_address, sink_address, 3, "33")
+        node.generatetoaddress(1, coinbase_address)
+        tx = node.omni_gettransaction(txid)
+        assert_equal(tx['valid'], False)
+
+        # Check final balance
         sink_balance = node.omni_getbalance(sink_address, 3)
         assert_equal(sink_balance['balance'], "1077")
 
